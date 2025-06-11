@@ -122,7 +122,7 @@ public class AdminPanel extends JFrame {
                 // 显示登录窗口（确保包路径正确）
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        new Login_register.log().showLogin();
+                        new log().showLogin();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

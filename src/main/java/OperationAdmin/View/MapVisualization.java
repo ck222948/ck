@@ -110,11 +110,13 @@ public class MapVisualization {
         // 创建按钮
 
         JButton button_Customize = new JButton("自定义生成地图");
-        button_Customize.setBounds(1050, 380, 400, 120);
+        button_Customize.setBounds(1050, 350, 350, 100);
         JButton button_explore = new JButton("随机生成地图");
-        button_explore.setBounds(1050, 580, 400, 120);
+        button_explore.setBounds(1050, 500, 350, 100);
         JButton button_Start = new JButton("开始探索");
-        button_Start.setBounds(1050, 780, 400, 120);
+        button_Start.setBounds(1050, 650, 350, 100);
+        JButton button_EXIT = new JButton("返回主菜单");
+        button_EXIT.setBounds(1050,800 , 350, 100);
 
 
 
@@ -135,7 +137,22 @@ public class MapVisualization {
         frame.add(GPS_num);
         frame.add(textGPS_num);
         frame.add(Plannings);
+        frame.add(button_EXIT);
 
+
+
+        button_EXIT.addActionListener(e -> {
+            // 显示登录窗口（确保包路径正确）
+            frame.dispose();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                new Menu().Menu();
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        });
         // 创建下拉框
         String[] options = {"JPS", "AStar","Dijkstra","BFS","Floyd"};
         JComboBox<String> comboBox = new JComboBox<>(options);

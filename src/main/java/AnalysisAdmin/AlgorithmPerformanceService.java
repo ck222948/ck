@@ -2,6 +2,7 @@ package AnalysisAdmin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 
 import java.awt.Point;
 import java.sql.Connection;
@@ -45,7 +46,7 @@ public class AlgorithmPerformanceService {
             String sql = "SELECT * FROM algorithm_performance";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
-            
+
             performanceDataList.clear();
             while (rs.next()) {
                 AlgorithmPerformanceData data = new AlgorithmPerformanceData();
@@ -137,6 +138,37 @@ public class AlgorithmPerformanceService {
         return performanceDataList;
     }
 
+    /**
+     * 分页获取性能数据
+     * @param offset 起始位置
+     * @param limit 每页数量
+     * @return 分页数据列表
+     */
+    public List<AlgorithmPerformanceData> getDataByOffset(int offset, int limit) {
+        String sql = "SELECT * FROM algorithm_performance LIMIT ?, ?";
+        this.performanceDataList.clear();
+        try (Connection connection = MySQLDatabaseConnection.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, offset);
+            statement.setInt(2, limit);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                AlgorithmPerformanceData data = new AlgorithmPerformanceData();
+                data.setId(UUID.fromString(rs.getString("id")));
+                data.setAlgorithmName(rs.getString("algorithm_name"));
+                data.setPlanTime(rs.getLong("plan_time"));
+                data.setMapSize(new Point(rs.getInt("map_width"), rs.getInt("map_height")));
+                data.setObstacleDensity(rs.getDouble("obstacle_density"));
+                List<String> steps = List.of(rs.getString("steps_with_times").split(";"));
+                data.setStepsWithTimes(steps);
+                performanceDataList.add(data);
+            }
+            return performanceDataList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void saveData(AlgorithmPerformanceData data) {
         try (Connection connection = MySQLDatabaseConnection.getConnection()) {
@@ -157,5 +189,38 @@ public class AlgorithmPerformanceService {
         for (AlgorithmPerformanceData data : dataList) {
             saveData(data);
         }
+    }
+
+    /**
+     * 根据id删除数据
+     * @param id 要删除的数据id
+     */
+    public void deleteById(UUID id) {
+        try (Connection connection = MySQLDatabaseConnection.getConnection()) {
+            String sql = "DELETE FROM algorithm_performance WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, id.toString());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("删除数据失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * <p>保存数据</p>
+     * @param stepsWithTimes 格式：^(\d+,\d+)(;\d+,\d+)*$
+     * @param algorithmName 算法名称
+     * @param planTime 规划耗时
+     * @param mapSize 地图尺寸
+     * @param obstacleDensity 障碍物密度
+     */
+    public void saveData(String stepsWithTimes, String algorithmName, long planTime, Point mapSize, double obstacleDensity) {
+        AlgorithmPerformanceData data = new AlgorithmPerformanceData();
+        data.setId(UUID.randomUUID());
+        data.setAlgorithmName(algorithmName);
+        data.setPlanTime(planTime);
+        data.setMapSize(mapSize);
+        List<String> steps = List.of(stepsWithTimes.split(";"));
+        data.setStepsWithTimes(steps);
     }
 }
