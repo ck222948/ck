@@ -1,9 +1,6 @@
 package OperationAdmin.View;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 
 public class Login extends JFrame {
     int width =1600;
@@ -16,10 +13,5 @@ public class Login extends JFrame {
         setVisible(true);
         setResizable(false);
         setVisible(true);
-
-
-
-
     }
-
 }

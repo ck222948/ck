@@ -17,12 +17,8 @@ import java.util.Random;
 
 public class MapVisualization {
 
-
     public static List<Car> cars = new ArrayList<>();
     Activemq activeMQListenerService;
-
-
-
 
     public static int MAP_WIDTH = 10;
     public static int MAP_HEIGHT = 10;
@@ -32,8 +28,6 @@ public class MapVisualization {
             new Color(255, 255, 255),
             new Color(139, 69, 19),
             new Color(34, 139, 34)
-
-
     };
     static final Color[] Map_COLORS = {
 
@@ -44,7 +38,6 @@ public class MapVisualization {
     public static String obstacle_map;
     public static String map;
 
-
     void draw_black() {
         int x=MAP_HEIGHT*MAP_WIDTH;
         String temp = "";
@@ -52,14 +45,10 @@ public class MapVisualization {
             temp=temp+"0";
         }
         map= temp;
-
     }
-
 
     public void createAndShowGUI() {
         activeMQListenerService = new Activemq();
-
-
 
         JLabel labelWidth = new JLabel("宽度:");
         JTextField textWidth = new JTextField("10", 5);  // 默认值10
@@ -73,10 +62,6 @@ public class MapVisualization {
         JButton buttonGPS = new JButton("修改导航器数量");
         JLabel Plannings = new JLabel("算法选择:");
 
-
-
-
-
         labelWidth.setBounds(1050, 40, 80, 30);
         textWidth.setBounds(1130,  40, 100, 30);
         labelHeight.setBounds(1050, 80, 80, 30);
@@ -89,7 +74,6 @@ public class MapVisualization {
         textGPS_num.setBounds(1130, 200, 100, 30);
         Plannings.setBounds(1150, 300, 80, 30);
 
-
         draw_black();
 
         JFrame frame = new JFrame("单字符串地图可视化");
@@ -100,15 +84,10 @@ public class MapVisualization {
         obscate_MapPanel obstacle_mapPanel = new obscate_MapPanel();
         obstacle_mapPanel.setBounds(0, 0, MAP_WIDTH*(CELL_SIZE+1), MAP_HEIGHT*(CELL_SIZE+1)); // 限制面板区域
 
-
-
-
         JButton buttonAddCar = new JButton("添加小车");
         buttonAddCar.setBounds(1280, 140, 150, 40);
 
-
         // 创建按钮
-
         JButton button_Customize = new JButton("自定义生成地图");
         button_Customize.setBounds(1050, 350, 350, 100);
         JButton button_explore = new JButton("随机生成地图");
@@ -117,9 +96,6 @@ public class MapVisualization {
         button_Start.setBounds(1050, 650, 350, 100);
         JButton button_EXIT = new JButton("返回主菜单");
         button_EXIT.setBounds(1050,800 , 350, 100);
-
-
-
 
         // 添加按钮到窗口
         frame.add(labelWidth);
@@ -139,15 +115,12 @@ public class MapVisualization {
         frame.add(Plannings);
         frame.add(button_EXIT);
 
-
-
         button_EXIT.addActionListener(e -> {
             // 显示登录窗口（确保包路径正确）
             frame.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
-                new Menu().Menu();
-
+                    new Menu().Menu();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -167,12 +140,8 @@ public class MapVisualization {
             activeMQListenerService.writeMessage("algorithm", String.valueOf(comboBox.getSelectedIndex()));
             //int selectedIndex = comboBox.getSelectedIndex();
             //System.out.println("选中的索引是: " + selectedIndex);
-
-
-
             //System.out.println("选中了: " + selected);
         });
-
 
         //frame.setLayout(null); // 设置为绝对布局
         comboBox.setBounds(1300, 300, 80, 30);
@@ -180,17 +149,11 @@ public class MapVisualization {
         frame.add(comboBox);
         //frame.setVisible(true);
 
-
-
-
-
         //修改地图大小
         buttonConfirm.addActionListener(e -> {
             try {
                 int newWidth = Integer.parseInt(textWidth.getText());
                 int newHeight = Integer.parseInt(textHeight.getText());
-
-
 
                 MAP_WIDTH = newWidth;
                 MAP_HEIGHT = newHeight;
@@ -203,15 +166,9 @@ public class MapVisualization {
                     CELL_SIZE=880/MAP_HEIGHT;
                 }
 
-
                 //customizeMap();
                 draw_black();
                 obstacle_mapPanel.setBounds(0, 0, MAP_WIDTH*(CELL_SIZE+1), MAP_HEIGHT*(CELL_SIZE+1)); // 限制面板区域
-
-
-
-
-
 
                 // 更新面板尺寸
                 obstacle_mapPanel.setPreferredSize(new Dimension(
@@ -234,8 +191,6 @@ public class MapVisualization {
             }
             int cur_Num = Integer.parseInt(textlabelcar_Num.getText());
 
-
-
             int maxAttempts = 1000;
             int x = -1, y = -1;
             boolean positionValid = false;
@@ -247,7 +202,6 @@ public class MapVisualization {
 
                     int index = y * MAP_WIDTH + x;
                     //System.out.println(x+","+y);
-
 
                     // 检查坐标有效性和可通行性
                     if (index >= obstacle_map.length() || obstacle_map.charAt(index) != '0') {
@@ -265,12 +219,8 @@ public class MapVisualization {
                     }
                     if (collision) continue;
 
-
                     positionValid = true;
                     break;
-
-
-
                 }
                 if (positionValid) {
 
@@ -281,15 +231,10 @@ public class MapVisualization {
                     activeMQListenerService.writeMessage("CarNumber", String.valueOf(cars.size()));
                     obstacle_mapPanel.repaint();
                 } else {
-
                     JOptionPane.showMessageDialog(frame, "无法找到有效位置", "错误", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
-
-
-
-
         });
 
         buttonGPS.addActionListener(new ActionListener() {
@@ -298,33 +243,23 @@ public class MapVisualization {
                 try {
                     int NaviNumber = Integer.parseInt(textGPS_num.getText());
 
-
                     if (NaviNumber < 1 || NaviNumber > 10) {
                         JOptionPane.showMessageDialog(frame, "请输入1-10之间的整数", "错误", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-
                     activeMQListenerService.writeMessage("NaviNumber", String.valueOf(NaviNumber));
-
-
-
-
-
-
                     // 更新面板尺寸
                     obstacle_mapPanel.setPreferredSize(new Dimension(
                             MAP_WIDTH * CELL_SIZE + 1,
                             MAP_HEIGHT * CELL_SIZE + 1
                     ));
                     obstacle_mapPanel.repaint();
-
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(frame, "请输入有效整数", "错误", JOptionPane.ERROR_MESSAGE);
                 }
 
             }
         });
-
         button_explore.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -344,8 +279,6 @@ public class MapVisualization {
                     JOptionPane.showMessageDialog(frame, "您还没有添加地图", "错误", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-
-
                 tage=2;
                 activeMQListenerService.writeMessage("IsViewOpen","1");
 
@@ -376,10 +309,6 @@ public class MapVisualization {
             }
         });
 
-
-
-
-
         // 添加鼠标点击监听
         obstacle_mapPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -400,56 +329,33 @@ public class MapVisualization {
                         obstacle_mapPanel.repaint();
                         //frame.add(button_explore);
                     }
-
-
-
-
-
-
                 }
-
             }
         });
-
         frame.add(obstacle_mapPanel);
         frame.setSize(1600, 1200); // 手动设置窗口大小
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
-
-
-
     }
 
     private void ex_bitmap(String map,String key) {
         Jedis jedis = new Jedis("192.168.43.69", 6379);
         try {
-
-
             for (int i = 0; i < map.length(); i++) {
 
                 if(map.charAt(i) =='0') {
                     jedis.setbit(key,i,false);
-
                 }
                 else {
                     jedis.setbit(key,i,true);
                 }
-
             }
-
-
-
         }catch (Exception e) {
             System.err.println("<wrong>: " + e.getMessage());
         }
         finally {
-
             jedis.close();
         }
-
-
-
     }
 
     private void customizeMap() {
@@ -471,7 +377,6 @@ public class MapVisualization {
         }
         obstacle_map = sb.toString();
     }
-
 
     public class obscate_MapPanel extends JPanel {
         @Override
@@ -501,15 +406,10 @@ public class MapVisualization {
                             int terrainType_map = Character.getNumericValue(map.charAt(index));
                             int terrainType_obscate_map = Character.getNumericValue(obstacle_map.charAt(index));
 
-
                             for (Car car : cars) {
-
                                 int x = car.getX();  // 获取当前小车的 x 坐标
                                 int y = car.getY();  // 获取当前小车的 y 坐标
-
-                                if(x==col && y==row)
-                                {
-
+                                if(x==col && y==row) {
                                     g.setColor(TERRAIN_COLORS[2]);
                                     g.fillRect(
                                             col * CELL_SIZE,
@@ -528,31 +428,19 @@ public class MapVisualization {
                                     break;
                                 }
                                 else{
-                                    if(terrainType_map==0)
-                                    {
+                                    if(terrainType_map==0) {
                                         g.setColor(Map_COLORS[0]);
                                     }
-                                    else if(terrainType_obscate_map==1)
-                                    {
+                                    else if(terrainType_obscate_map==1) {
                                         g.setColor(TERRAIN_COLORS[1]);
                                     }
-                                    else
-                                    {
+                                    else {
                                         g.setColor(Map_COLORS[1]);
                                     }
-
                                 }
-
-
                             }
-
-
                         }
                     }
-
-
-
-
                     if(!flage_text){
                         // 绘制单元格
                         g.fillRect(
@@ -562,13 +450,8 @@ public class MapVisualization {
                                 CELL_SIZE - 1
                         );
                     }
-
-
                 }
             }
         }
     }
-
-
-
 }

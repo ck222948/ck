@@ -13,20 +13,9 @@ public class Replay {
             JFrame frame = new JFrame("多车地图回放");
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             JOptionPane.showMessageDialog(frame, "地图为空或无效", "错误", JOptionPane.ERROR_MESSAGE);
-
-
-
-
         }
-
         else {
             mapReplay.createAndShowGUI();
         }
-
-
-
-
-
     }
-
 }

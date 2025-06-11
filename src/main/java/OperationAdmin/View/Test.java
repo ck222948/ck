@@ -3,7 +3,6 @@ package OperationAdmin.View;
 import javax.swing.*;
 
 public class Test extends JFrame {
-
     public void Test() {
         JFrame frame = new JFrame("手动设置按钮坐标和大小");
         frame.setLocationRelativeTo(null);
@@ -18,7 +17,4 @@ public class Test extends JFrame {
         frame.add(button);
         frame.setVisible(true);
     }
-
-
-
 }

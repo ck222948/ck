@@ -10,14 +10,12 @@ public class Bitmap {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be positive integers");
         }
-
         this.width = width;
         this.height = height;
         this.totalBits = width * height;
         this.byteSize = (totalBits + 7) / 8; // 计算所需字节数
         this.bitmap = new byte[byteSize];    // 初始化为全0
     }
-
 
     /**
      * 将二维坐标转换为一维索引
@@ -40,15 +38,6 @@ public class Bitmap {
         return new int[]{byteIndex, bitOffset};
     }
 
-
-
-
-
-
-
-
-
-
     /**
      * 获取位图的字节表示(可用于存储)
      * @return 字节数组
@@ -56,8 +45,4 @@ public class Bitmap {
     public byte[] getBytes() {
         return bitmap.clone();
     }
-
-
-
-
 }
