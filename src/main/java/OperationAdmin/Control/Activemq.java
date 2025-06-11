@@ -58,7 +58,6 @@ public class Activemq extends Thread{
                         String text = ((TextMessage) message).getText();
                         if(text.equals("#")){
                             saveDataToDataBase();
-                            return;
                         }
                         map=readBitmap("map");
                         int k = 1;
