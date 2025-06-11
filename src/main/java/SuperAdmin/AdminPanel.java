@@ -55,7 +55,7 @@ public class AdminPanel extends JFrame {
         loadUserData();
     }
 
-    private JPanel createToolbar() {
+    private JPanel createToolbar() {//添加工具栏（按钮）
         JPanel toolBarContainer = new JPanel(new BorderLayout());
         toolBarContainer.setBackground(Color.WHITE);
 
@@ -82,7 +82,7 @@ public class AdminPanel extends JFrame {
         searchField = new JTextField(20);
         JButton searchButton = UIUtils.createStyledButton("搜索", new Color(52, 152, 219));
 
-        roleFilter = new JComboBox<>(new String[]{"所有角色", "管理员", "分析员", "配置员"});
+        roleFilter = new JComboBox<>(new String[]{"所有角色", "超级管理员", "系统分析员", "实验配置管理员"});
         roleFilter.setBackground(Color.WHITE);
 
         searchPanel.add(new JLabel("搜索:"));
@@ -109,15 +109,26 @@ public class AdminPanel extends JFrame {
         return toolBarContainer;
     }
 
-    private void createMenuBar() {
+    private void createMenuBar() {//菜单
         JMenuBar menuBar = new JMenuBar();
         JMenu exitMenu = new JMenu("退出");
-        exitMenu.addActionListener(e -> {
-            this.dispose();
-            new log().showLogin();
-        });
-        menuBar.add(exitMenu);
-        this.setJMenuBar(menuBar);
+        JMenuItem exitMenuItem = new JMenuItem("退出管理系统");
+        exitMenu.add(exitMenuItem);
+        exitMenuItem.addActionListener(e -> {
+
+                System.out.println("尝试退出..."); // 调试
+                this.dispose(); // 关闭当前窗口
+
+                // 显示登录窗口（确保包路径正确）
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        new Login_register.log().showLogin();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            });
+
 
         JMenu helpMenu = new JMenu("帮助");
         JMenuItem aboutItem = new JMenuItem("关于");
@@ -126,29 +137,29 @@ public class AdminPanel extends JFrame {
 
         menuBar.add(exitMenu);
         menuBar.add(helpMenu);
+        setJMenuBar(menuBar); // 关键！必须设置菜单栏
 
-        setJMenuBar(menuBar);
     }
 
     private void showAboutDialog() {
         JOptionPane.showMessageDialog(this,
-                "用户管理系统 v1.0\n基于用户名身份验证\n© 2023",
+                "用户管理系统 v2.1",
                 "关于",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void createUserTable() {
-        String[] columns = {"用户名", "账户", "密码", "角色"}; // 新增密码列
+    private void createUserTable() {//表格
+        String[] columns = {"用户名", "账号", "密码", "角色"};
 
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int row, int column) {//不可编辑
                 return false;
             }
         };
 
         userTable = new JTable(tableModel);
-        userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);//可以单行选择
         userTable.getTableHeader().setFont(new Font("微软雅黑", Font.BOLD, 14));
         userTable.setFont(new Font("微软雅黑", Font.PLAIN, 13));
         userTable.setRowHeight(30);
@@ -157,16 +168,16 @@ public class AdminPanel extends JFrame {
         userTable.setIntercellSpacing(new Dimension(1, 1));
     }
 
-    private void loadUserData() {
+    private void loadUserData() {//获得表格内容
 
-        List<User> users = UserDAO.getAllUsers();
+        List<User> users = UserDAO.getAllUsers();//select *
         tableModel.setRowCount(0);
 
         for (User user : users) {
             Vector<Object> row = new Vector<>();
             row.add(user.getUsername());
             row.add(user.getAccount());
-            row.add(user.getPassword()); // 显示密码
+            row.add(user.getPassword());
             row.add(user.getRole());
             tableModel.addRow(row);
         }
@@ -186,7 +197,7 @@ public class AdminPanel extends JFrame {
                 loadUserData();
                 UIUtils.showInfoMessage("用户添加成功", "操作成功");
             } else {
-                UIUtils.showErrorMessage("用户名已存在，请选择其他用户名", "输入错误");
+                UIUtils.showErrorMessage("账号已存在，请重新输入", "输入错误");
             }
         }
     }
@@ -200,10 +211,10 @@ public class AdminPanel extends JFrame {
         // 获取行的所有信息
         String username = (String) userTable.getValueAt(selectedRow, 0);
         String account = (String) userTable.getValueAt(selectedRow, 1);
-        String password = (String) userTable.getValueAt(selectedRow, 2); // 获取表格中的密码
-        String role = (String) userTable.getValueAt(selectedRow, 3);   // 第三列是角色
+        String password = (String) userTable.getValueAt(selectedRow, 2);
+        String role = (String) userTable.getValueAt(selectedRow, 3);
 
-        User existingUser = new User(username, password, account, role);
+        User existingUser = new User(username, account, role, password);
         UserDialog dialog = new UserDialog(this, "编辑用户", true, existingUser);
         dialog.setVisible(true);
 
@@ -223,14 +234,12 @@ public class AdminPanel extends JFrame {
             UIUtils.showErrorMessage("请选择要删除的用户", "操作提示");
             return;
         }
-
-        // 使用账户作为唯一标识
         String account = (String) userTable.getValueAt(selectedRow, 1);
         String username = (String) userTable.getValueAt(selectedRow, 0);
 
-        int confirm = JOptionPane.showConfirmDialog(
+        int confirm = JOptionPane.showConfirmDialog(//删除确认，增加容错
                 this,
-                "确定要删除用户 '" + username + "' (账户: " + account + ") 吗？",
+                "确定要删除用户 '" + username + "' (账号: " + account + ") 吗？",
                 "确认删除",
                 JOptionPane.YES_NO_OPTION);
 
@@ -248,13 +257,13 @@ public class AdminPanel extends JFrame {
             return;
         }
 
-        List<User> users = UserDAO.searchUsers(searchTerm);
+        List<User> users = UserDAO.searchUsers(searchTerm);//这里可以通过用户名和账户来查找
         updateTableWithUsers(users);
 
         UIUtils.showInfoMessage("找到 " + users.size() + " 条匹配记录", "搜索结果");
     }
 
-    private void filterByRole() {
+    private void filterByRole() {//下拉条查找
         String selectedRole = (String) roleFilter.getSelectedItem();
         if (selectedRole.equals("所有角色")) {
             loadUserData();
@@ -267,7 +276,7 @@ public class AdminPanel extends JFrame {
         UIUtils.showInfoMessage("找到 " + users.size() + " 个" + selectedRole, "筛选结果");
     }
 
-    private void updateTableWithUsers(List<User> users) {
+    private void updateTableWithUsers(List<User> users) {//根据获得的用户来更新表格内容
         tableModel.setRowCount(0);
         for (User user : users) {
             Vector<Object> row = new Vector<>();

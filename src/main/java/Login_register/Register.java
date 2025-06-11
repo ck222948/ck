@@ -209,17 +209,17 @@ return formPanel;
 
     // 用户注册数据库操作
     private boolean registerUser(String username, String password, String role, String account) {
-        String checkSql = "SELECT * FROM users WHERE username = ?";
+        String checkSql = "SELECT * FROM users WHERE account = ?";
         String insertSql = "INSERT INTO users (username, password, role, account) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
 
-            // 检查用户名是否已存在
-            checkStmt.setString(1, username);
+            // 检账户是否已存在
+            checkStmt.setString(1, account);
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next()) {
-                return false; // 用户已存在
+                return false; // 账户已存在
             }
 
             // 密码加密处理
@@ -242,6 +242,7 @@ return formPanel;
     }
 
     // 使用 SHA-256 加密密码
+
     private String encryptPassword(String password) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");

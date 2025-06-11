@@ -62,7 +62,7 @@ public class UserDialog extends JDialog {
     private void addEditModeFields(JPanel formPanel, GridBagConstraints gbc, User existingUser) {
         // 账户字段移动到第一个位置（主键）
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("账户:"), gbc); // 不再设为只读
+        formPanel.add(new JLabel("账号:"), gbc); // 不再设为只读
 
         gbc.gridx = 1;
         accountField = new JTextField(existingUser.getAccount());
@@ -89,7 +89,7 @@ public class UserDialog extends JDialog {
         formPanel.add(new JLabel("密码:"), gbc);
 
         gbc.gridx = 1;
-        passwordField = new JPasswordField(existingUser.getPassword()); // 预填密码
+        passwordField = new JPasswordField(); 
         formPanel.add(passwordField, gbc);
 
         // 确认密码
@@ -105,7 +105,7 @@ public class UserDialog extends JDialog {
         formPanel.add(new JLabel("角色:"), gbc);
 
         gbc.gridx = 1;
-        roleCombo = new JComboBox<>(new String[]{"管理员", "分析员", "配置员"});
+        roleCombo = new JComboBox<>(new String[]{"超级管理员", "实验分析员", "实验配置管理员"});
         roleCombo.setSelectedItem(existingUser.getRole());
         formPanel.add(roleCombo, gbc);
     }
@@ -113,7 +113,7 @@ public class UserDialog extends JDialog {
     private void addAddModeFields(JPanel formPanel, GridBagConstraints gbc) {
         // 账户字段移动到第一个位置（主键）
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("账户:"), gbc);
+        formPanel.add(new JLabel("账号:"), gbc);
 
         gbc.gridx = 1;
         accountField = new JTextField(20);
@@ -149,25 +149,35 @@ public class UserDialog extends JDialog {
         formPanel.add(new JLabel("角色:"), gbc);
 
         gbc.gridx = 1;
-        roleCombo = new JComboBox<>(new String[]{"管理员", "分析员", "配置员"});
+        roleCombo = new JComboBox<>(new String[]{"超级管理员", "实验分析员", "实验配置管理员"});
         formPanel.add(roleCombo, gbc);
     }
-
     private void handleSaveAction() {
-        // 收集表单数据
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
         String confirmPassword = new String(confirmPasswordField.getPassword());
         String role = (String) roleCombo.getSelectedItem();
         String account = accountField.getText().trim();
 
-        // 验证逻辑（需要确保账户不为空）
-        if (!UIUtils.validateUserInput(username, password, confirmPassword, account)) {
+
+        if (!UIUtils.validateUserInput(username, account)) {
+            return;
+        }
+        if (!isEditMode && (password.isEmpty() || !password.equals(confirmPassword))) {
+            UIUtils.showErrorMessage("密码不能为空且必须一致", "输入错误");
+            return;
+        }
+        if (isEditMode && !password.isEmpty() && !password.equals(confirmPassword)) {
+            UIUtils.showErrorMessage("两次输入的密码不一致", "输入错误");
             return;
         }
 
-        // 使用正确的参数顺序：用户名、账户、角色
-        userResult = new User(username, account, role,password);
+        if (isEditMode && password.isEmpty()) {
+            userResult = new User(username, account, role, "");
+        } else {
+            userResult = new User(username, account, role, password);
+        }
+
         confirmed = true;
         dispose();
     }

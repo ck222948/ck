@@ -1,16 +1,11 @@
 package SuperAdmin;
 
-public class User {
+public class User {//用户实体类
     private String username;
     private String password;
     private String role;
     private String account;
 
-    public User(String username, String account, String role) {
-        this.username = username;
-        this.role = role;
-        this.account = account;
-    }
 
     public User(String username,  String account,String role, String password) {
         this.username = username;

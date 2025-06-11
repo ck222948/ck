@@ -4,12 +4,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
-    public static List<User> getAllUsers() {
+public class UserDAO {//数据操作类
+    public static List<User> getAllUsers() {//获取所有用户信息
         List<User> users = new ArrayList<>();
         try (Connection conn = DatabaseConnector.getConnection()) {
             Statement stmt = conn.createStatement();
-            // 添加密码字段查询
             ResultSet rs = stmt.executeQuery("SELECT username, account, role, password FROM users");
 
             while (rs.next()) {
@@ -37,9 +36,9 @@ public class UserDAO {
             String sql = "INSERT INTO users (username, password, role, account) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, user.getUsername());
-                pstmt.setString(2, user.getPassword());
+                pstmt.setString(2, PasswordUtil.encryptPassword(user.getPassword()));
                 pstmt.setString(3, user.getRole());
-                pstmt.setString(4, user.getAccount());
+                pstmt.setString(4, user.getAccount());//将SQL语句中的占位符?替换为实际的用户数据
                 pstmt.executeUpdate();
             }
             return true;
@@ -62,10 +61,10 @@ public class UserDAO {
             String sql = "UPDATE users SET username = ?, password = ?, role = ?, account = ? WHERE account = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, updatedUser.getUsername());
-                pstmt.setString(2, updatedUser.getPassword());
+                pstmt.setString(2, PasswordUtil.encryptPassword(updatedUser.getPassword()));
                 pstmt.setString(3, updatedUser.getRole());
-                pstmt.setString(4, updatedUser.getAccount()); // 新账户
-                pstmt.setString(5, originalAccount); // 原账户
+                pstmt.setString(4, updatedUser.getAccount());
+                pstmt.setString(5, originalAccount);
                 pstmt.executeUpdate();
             }
             return true;
@@ -75,9 +74,9 @@ public class UserDAO {
         }
     }
 
-    public static boolean deleteUser(String account) { // 参数改为账户
+    public static boolean deleteUser(String account) {
         try (Connection conn = DatabaseConnector.getConnection()) {
-            String sql = "DELETE FROM users WHERE account = ?"; // 改为账户
+            String sql = "DELETE FROM users WHERE account = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, account);
                 pstmt.executeUpdate();
@@ -136,7 +135,7 @@ public class UserDAO {
         return users;
     }
 
-    public static boolean userExists(String account) {
+    public static boolean userExists(String account) {//查询写入的account是否在数据库中已经存在
         try (Connection conn = DatabaseConnector.getConnection()) {
             String sql = "SELECT COUNT(*) FROM users WHERE account = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -22,7 +22,14 @@ public class log {
     private JTextField userText;
     private JPasswordField passwordText;
     private JComboBox<String> roleBox;
-
+    /**
+     * 静态方法显示登录界面
+     */
+    public static void showLoginFrame() {
+        SwingUtilities.invokeLater(() -> {
+            new log().showLogin();
+        });
+    }
     public void showLogin() {
         frame = new JFrame("登录界面");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
