@@ -65,12 +65,13 @@ public class Menu extends JFrame {
         });
 
         buttonQuit.addActionListener(e -> {
+
             int confirm = JOptionPane.showConfirmDialog(frame,
                     "确定要退出系统吗？", "退出确认",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
-                this.dispose(); // 关闭当前窗口
 
+                frame.dispose();
                 // 显示登录窗口（确保包路径正确）
                 SwingUtilities.invokeLater(() -> {
                     try {
