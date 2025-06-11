@@ -16,8 +16,6 @@ public class StringToBitmapConverter {
             throw new IllegalArgumentException("二进制字符串不能为空");
         }
 
-
-
         try (Jedis jedis = jedisPool.getResource()) {
             // 3. 删除旧数据（可选）
             jedis.del(key);
@@ -59,7 +57,4 @@ public class StringToBitmapConverter {
         }
         return bytes;
     }
-
-
-
 }

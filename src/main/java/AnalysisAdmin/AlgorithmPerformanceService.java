@@ -52,7 +52,7 @@ public class AlgorithmPerformanceService {
                 AlgorithmPerformanceData data = new AlgorithmPerformanceData();
                 data.setId(UUID.fromString(rs.getString("id")));
                 data.setAlgorithmName(rs.getString("algorithm_name"));
-                data.setPlanTime(rs.getLong("plan_time"));
+                data.setPlanTime(rs.getDouble("plan_time"));
                 data.setMapSize(new Point(rs.getInt("map_width"), rs.getInt("map_height")));
                 data.setObstacleDensity(rs.getDouble("obstacle_density"));
                 List<String> steps = List.of(rs.getString("steps_with_times").split(";"));
@@ -87,7 +87,7 @@ public class AlgorithmPerformanceService {
                 AlgorithmPerformanceData data = new AlgorithmPerformanceData();
                 data.setId(UUID.fromString(rs.getString("id")));
                 data.setAlgorithmName(rs.getString("algorithm_name"));
-                data.setPlanTime(rs.getLong("plan_time"));
+                data.setPlanTime(rs.getDouble("plan_time"));
                 data.setMapSize(new Point(rs.getInt("map_width"), rs.getInt("map_height")));
                 data.setObstacleDensity(rs.getDouble("obstacle_density"));
                 List<String> steps = List.of(rs.getString("steps_with_times").split(";"));
@@ -116,7 +116,7 @@ public class AlgorithmPerformanceService {
                 AlgorithmPerformanceData data = new AlgorithmPerformanceData();
                 data.setId(UUID.fromString(rs.getString("id")));
                 data.setAlgorithmName(rs.getString("algorithm_name"));
-                data.setPlanTime(rs.getLong("plan_time"));
+                data.setPlanTime(rs.getDouble("plan_time"));
                 data.setMapSize(new Point(rs.getInt("map_width"), rs.getInt("map_height")));
                 data.setObstacleDensity(rs.getDouble("obstacle_density"));
                 List<String> steps = List.of(rs.getString("steps_with_times").split(";"));
@@ -156,7 +156,7 @@ public class AlgorithmPerformanceService {
                 AlgorithmPerformanceData data = new AlgorithmPerformanceData();
                 data.setId(UUID.fromString(rs.getString("id")));
                 data.setAlgorithmName(rs.getString("algorithm_name"));
-                data.setPlanTime(rs.getLong("plan_time"));
+                data.setPlanTime(rs.getDouble("plan_time"));
                 data.setMapSize(new Point(rs.getInt("map_width"), rs.getInt("map_height")));
                 data.setObstacleDensity(rs.getDouble("obstacle_density"));
                 List<String> steps = List.of(rs.getString("steps_with_times").split(";"));
@@ -214,13 +214,21 @@ public class AlgorithmPerformanceService {
      * @param mapSize 地图尺寸
      * @param obstacleDensity 障碍物密度
      */
-    public void saveData(String stepsWithTimes, String algorithmName, long planTime, Point mapSize, double obstacleDensity) {
-        AlgorithmPerformanceData data = new AlgorithmPerformanceData();
-        data.setId(UUID.randomUUID());
-        data.setAlgorithmName(algorithmName);
-        data.setPlanTime(planTime);
-        data.setMapSize(mapSize);
-        List<String> steps = List.of(stepsWithTimes.split(";"));
-        data.setStepsWithTimes(steps);
+    public void saveData(String stepsWithTimes, String algorithmName, double planTime, Point mapSize, double obstacleDensity) {
+        try (Connection connection = MySQLDatabaseConnection.getConnection()) {
+            String sql = "INSERT INTO algorithm_performance (id, algorithm_name, plan_time, map_width, map_height, obstacle_density, steps_with_times) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            UUID id = UUID.randomUUID();
+            statement.setString(1, id.toString());
+            statement.setString(2, algorithmName);
+            statement.setDouble(3, planTime);
+            statement.setInt(4, (int) mapSize.getX());
+            statement.setInt(5, (int) mapSize.getY());
+            statement.setDouble(6, obstacleDensity);
+            statement.setString(7, stepsWithTimes);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("保存数据失败: {}", e.getMessage());
+        }
     }
 }

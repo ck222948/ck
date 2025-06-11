@@ -10,7 +10,6 @@ public class Car {
         this.y = y;
         this.id = id;
     }
-
     // Getter 和 Setter 方法
     public int getX() { return x; }
     public int getY() { return y; }

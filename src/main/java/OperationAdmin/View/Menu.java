@@ -1,14 +1,10 @@
 package OperationAdmin.View;
 
-
-
 import OperationAdmin.Control.Explore_experiments;
 import OperationAdmin.Control.Replay;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Menu extends JFrame {
     private static final int WIDTH = 1000;
@@ -73,7 +69,6 @@ public class Menu extends JFrame {
                     "确定要退出系统吗？", "退出确认",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
-
                 this.dispose(); // 关闭当前窗口
 
                 // 显示登录窗口（确保包路径正确）
@@ -86,10 +81,8 @@ public class Menu extends JFrame {
                 });
             }
         });
-
         frame.setVisible(true);
     }
-
     // 创建美观按钮的辅助方法
     private JButton createStyledButton(String text, Font font, Color bgColor,
                                        Color hoverColor, Color textColor, Dimension size) {
@@ -110,8 +103,6 @@ public class Menu extends JFrame {
                 button.setBackground(bgColor);
             }
         });
-
         return button;
     }
-
 }
